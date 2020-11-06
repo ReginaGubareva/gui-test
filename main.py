@@ -8,6 +8,8 @@ num_of_episodes = 100
 time_step = 2
 t = datetime.now()
 t_max = 20
+was_real_done = False
+action_space = ['CLICK', 'TYPE']
 
 # open the site
 driver = webdriver.Chrome(fr'D:\chromedriver.exe')
@@ -36,7 +38,3 @@ for _ in range(num_of_episodes):
 
     # close the connection with browser
     driver.quit()
-
-
-# To click button in selenium we should
-# ActionChains(browser).click(element).perform()
