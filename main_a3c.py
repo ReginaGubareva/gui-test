@@ -1,5 +1,8 @@
 from __future__ import print_function, division
 import os
+
+import main
+
 os.environ["OMP_NUM_THREADS"] = "1"
 import argparse
 import torch
@@ -154,11 +157,11 @@ if __name__ == '__main__':
     #         env_conf = setup_json[i]
     # env = atari_env(args.env, env_conf, args)
 
-    # Не ясно что-такое shared_model
+    # shared_model is the model shared by the different agents (different threads in different cores)
     # Заменим аргументы в a3clstm, вместо env.observation_space будем передавать
     # наше состояние, вместо env.action_space - передадим массив действий
     # shared_model = A3Clstm(env.observation_space.shape[0], env.action_space)
-    shared_model = A3Clstm(state, action_space)
+    shared_model = A3Clstm(3, main.action_space)
 
     # Здесь происходит что-то важное
     if args.load:
@@ -186,7 +189,10 @@ if __name__ == '__main__':
     # аргументами. Это вопрос оптимизации ресурсов процессора,
     # который не имеет отношения к самому обучению
     # выяснить почему аргументом не может быть state
-    p = mp.Process(target=test, args=(args, shared_model, state))
+    # allowing to create the 'test' process with some arguments 'args' passed to the
+    # 'test' target function - the 'test' process doesn't update the shared model
+    # but uses it on a part of it - torch.multiprocessing.Process runs a function in an independent thread
+    p = mp.Process(target=test, args=(args, shared_model))
     p.start()
     processes.append(p)
     time.sleep(0.1)
@@ -196,7 +202,7 @@ if __name__ == '__main__':
     # здесь мы для каждого процесса передаем параметры и запускаем его
     for rank in range(0, args.workers):
         p = mp.Process(
-            target=train, args=(rank, args, shared_model, optimizer, state))
+            target=train, args=(rank, args, shared_model, optimizer))
         p.start()
         processes.append(p)
         time.sleep(0.1)

@@ -2,11 +2,12 @@ import datetime
 import time
 import pyautogui
 from selenium import webdriver
+from train import train
 from selenium.webdriver import ActionChains
 
 num_of_episodes = 100
 time_step = 2
-t = datetime.now()
+t = 1
 t_max = 20
 was_real_done = False
 action_space = ['CLICK', 'TYPE']
@@ -29,8 +30,10 @@ for _ in range(num_of_episodes):
         b_t = "visual boundaries of the DOM elements in the current view"
 
         # For getting per pixel probabilities we should modify algorithm A3C
-        # especially, action output
-        map_of_probabilities = "feed s_t to A3C and get map of probabilities"
+        # especially, action output "feed s_t to A3C and get map of probabilities"
+        map_of_probabilities = train(s_t, action_space)
+
+        print(map_of_probabilities)
 
         probabilities_per_element = "the elemtn probabilites"
         element = "choose element from probabilities_per_element"

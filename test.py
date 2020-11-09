@@ -3,7 +3,7 @@ from setproctitle import setproctitle as ptitle
 import torch
 from utils import setup_logger
 from model import A3Clstm
-from player_util import Agent
+from agent import Agent
 from torch.autograd import Variable
 import time
 import logging
@@ -31,6 +31,7 @@ def test(args, shared_model, env_conf):
     reward_total_sum = 0
     player = Agent(None, args, None)
     player.gpu_id = gpu_id
+    #TODO: change env to screenshot
     player.model = A3Clstm(player.env.observation_space.shape[0],
                            player.env.action_space)
 

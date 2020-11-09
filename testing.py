@@ -1,3 +1,4 @@
-import torch.nn as nn
+import torch
+from torch.autograd import Variable
 
-print(nn.init.calculate_gain('relu'))
+print(Variable(torch.zeros(1, 512)))

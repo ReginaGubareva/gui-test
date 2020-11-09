@@ -4,11 +4,11 @@ import torch
 import torch.optim as optim
 from utils import ensure_shared_grads
 from model import A3Clstm
-from player_util import Agent
+from agent import Agent
 from torch.autograd import Variable
 
 
-def train(rank, args, shared_model, optimizer, state, action_space):
+def train(rank, args, shared_model, optimizer, action_space, state):
     ptitle('Training Agent: {}'.format(rank))
 
     # this set gpu from command args --gpu-ids 0 1 2 3
@@ -30,59 +30,60 @@ def train(rank, args, shared_model, optimizer, state, action_space):
 
 
     # env.seed(args.seed + rank)
-    player = Agent(None, args, None)
-    player.gpu_id = gpu_id
-    player.model = A3Clstm(state, action_space)
+    agent = Agent(None, args, None)
+    agent.gpu_id = gpu_id
+    agent.model = A3Clstm(3, action_space)
 
-    player.state = player.env.reset()
-    player.state = torch.from_numpy(player.state).float()
+    agent.state = state
+    agent.state = torch.from_numpy(agent.state).float()
     if gpu_id >= 0:
         with torch.cuda.device(gpu_id):
-            player.state = player.state.cuda()
-            player.model = player.model.cuda()
-    player.model.train()
-    player.eps_len += 2
+            agent.state = agent.state.cuda()
+            agent.model = agent.model.cuda()
+    agent.model.train()
+    agent.eps_len += 2
     while True:
         if gpu_id >= 0:
             with torch.cuda.device(gpu_id):
-                player.model.load_state_dict(shared_model.state_dict())
+                agent.model.load_state_dict(shared_model.state_dict())
         else:
-            player.model.load_state_dict(shared_model.state_dict())
-        if player.done:
+            agent.model.load_state_dict(shared_model.state_dict())
+        if agent.done:
             if gpu_id >= 0:
                 with torch.cuda.device(gpu_id):
-                    player.cx = Variable(torch.zeros(1, 512).cuda())
-                    player.hx = Variable(torch.zeros(1, 512).cuda())
+                    agent.cx = Variable(torch.zeros(1, 512).cuda())
+                    agent.hx = Variable(torch.zeros(1, 512).cuda())
             else:
-                player.cx = Variable(torch.zeros(1, 512))
-                player.hx = Variable(torch.zeros(1, 512))
+                agent.cx = Variable(torch.zeros(1, 512))
+                agent.hx = Variable(torch.zeros(1, 512))
         else:
-            player.cx = Variable(player.cx.data)
-            player.hx = Variable(player.hx.data)
+            agent.cx = Variable(agent.cx.data)
+            agent.hx = Variable(agent.hx.data)
 
         for step in range(args.num_steps):
-            player.action_train()
-            if player.done:
+            agent.action_train()
+            if agent.done:
                 break
 
-        if player.done:
-            state = player.env.reset()
-            player.state = torch.from_numpy(state).float()
+        # TODO: change environment to screenshot
+        if agent.done:
+            state = agent.env.reset()
+            agent.state = torch.from_numpy(state).float()
             if gpu_id >= 0:
                 with torch.cuda.device(gpu_id):
-                    player.state = player.state.cuda()
+                    agent.state = agent.state.cuda()
 
         R = torch.zeros(1, 1)
-        if not player.done:
-            value, _, _ = player.model((Variable(player.state.unsqueeze(0)),
-                                        (player.hx, player.cx)))
+        if not agent.done:
+            value, _, _ = agent.model((Variable(agent.state.unsqueeze(0)),
+                                       (agent.hx, agent.cx)))
             R = value.data
 
         if gpu_id >= 0:
             with torch.cuda.device(gpu_id):
                 R = R.cuda()
 
-        player.values.append(Variable(R))
+        agent.values.append(Variable(R))
         policy_loss = 0
         value_loss = 0
         gae = torch.zeros(1, 1)
@@ -90,23 +91,24 @@ def train(rank, args, shared_model, optimizer, state, action_space):
             with torch.cuda.device(gpu_id):
                 gae = gae.cuda()
         R = Variable(R)
-        for i in reversed(range(len(player.rewards))):
-            R = args.gamma * R + player.rewards[i]
-            advantage = R - player.values[i]
+        for i in reversed(range(len(agent.rewards))):
+            R = args.gamma * R + agent.rewards[i]
+            advantage = R - agent.values[i]
             value_loss = value_loss + 0.5 * advantage.pow(2)
 
             # Generalized Advantage Estimataion
-            delta_t = player.rewards[i] + args.gamma * \
-                player.values[i + 1].data - player.values[i].data
+            delta_t = agent.rewards[i] + args.gamma * \
+                      agent.values[i + 1].data - agent.values[i].data
 
             gae = gae * args.gamma * args.tau + delta_t
 
             policy_loss = policy_loss - \
-                player.log_probs[i] * \
-                Variable(gae) - 0.01 * player.entropies[i]
+                          agent.log_probs[i] * \
+                          Variable(gae) - 0.01 * agent.entropies[i]
 
-        player.model.zero_grad()
+        agent.model.zero_grad()
         (policy_loss + 0.5 * value_loss).backward()
-        ensure_shared_grads(player.model, shared_model, gpu=gpu_id >= 0)
+        ensure_shared_grads(agent.model, shared_model, gpu=gpu_id >= 0)
         optimizer.step()
-        player.clear_actions()
+        agent.clear_actions()
+        return

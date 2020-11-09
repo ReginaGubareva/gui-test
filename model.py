@@ -8,6 +8,8 @@ from utils import norm_col_init, weights_init
 # Сейчас алгоритм принимает на вход num_inputs, что соответствует
 # env.observation_space и action_space. Action_space - это простой
 # массив действий, observation_space нужно заменить на state(screenshot)
+# num_inputs означает количество входных каналов, которые мы используем
+# для CNN, для RGB изображения, обычно 3
 
 # Это мозги A3C
 
