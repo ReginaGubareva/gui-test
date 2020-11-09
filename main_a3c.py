@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import os
 
-import main
+import description
 
 os.environ["OMP_NUM_THREADS"] = "1"
 import argparse
@@ -122,7 +122,7 @@ parser.add_argument(
 # training was far superior
 
 # This is launch command:
-# python main.py --env PongDeterministic-v4 --workers 32 --gpu-ids 0 1 2 3 --amsgrad True
+# python description.py --env PongDeterministic-v4 --workers 32 --gpu-ids 0 1 2 3 --amsgrad True
 
 
 # CUDA – это платформа для параллельных вычислений и модель API,
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     # Заменим аргументы в a3clstm, вместо env.observation_space будем передавать
     # наше состояние, вместо env.action_space - передадим массив действий
     # shared_model = A3Clstm(env.observation_space.shape[0], env.action_space)
-    shared_model = A3Clstm(3, main.action_space)
+    shared_model = A3Clstm(3, description.action_space)
 
     # Здесь происходит что-то важное
     if args.load:

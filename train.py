@@ -6,9 +6,13 @@ from utils import ensure_shared_grads
 from model import A3Clstm
 from agent import Agent
 from torch.autograd import Variable
+from selenium import webdriver
+import pyautogui
 
 
-def train(rank, args, shared_model, optimizer, action_space, state):
+# нужно изменить аргументы, state мы не должны получать функцию
+# мы должны менять его внутри функции
+def train(rank, args, shared_model, optimizer, action_space):
     ptitle('Training Agent: {}'.format(rank))
 
     # this set gpu from command args --gpu-ids 0 1 2 3
@@ -28,13 +32,18 @@ def train(rank, args, shared_model, optimizer, action_space, state):
             optimizer = optim.Adam(
                 shared_model.parameters(), lr=args.lr, amsgrad=args.amsgrad)
 
+    # Открываем наш сайт
+    driver = webdriver.Chrome(fr'D:\chromedriver.exe')
+    driver.get('https://digital.sberbank.kz/customer/login')
 
     # env.seed(args.seed + rank)
     agent = Agent(None, args, None)
     agent.gpu_id = gpu_id
+    # Здесь мы создаем модель, первый аргумент - это количество каналов в изображении
+    # в нашем случае RGB = 3, action space - набор совершаемых действий
     agent.model = A3Clstm(3, action_space)
 
-    agent.state = state
+    agent.state = pyautogui.screenshot()
     agent.state = torch.from_numpy(agent.state).float()
     if gpu_id >= 0:
         with torch.cuda.device(gpu_id):
@@ -60,6 +69,8 @@ def train(rank, args, shared_model, optimizer, action_space, state):
             agent.cx = Variable(agent.cx.data)
             agent.hx = Variable(agent.hx.data)
 
+        # основную тренировку делает агент
+        # TODO: неправильно передается num_steps
         for step in range(args.num_steps):
             agent.action_train()
             if agent.done:
@@ -67,7 +78,18 @@ def train(rank, args, shared_model, optimizer, action_space, state):
 
         # TODO: change environment to screenshot
         if agent.done:
-            state = agent.env.reset()
+            # здесь мы должны получать новое состояние
+            # для этого выясним как происходит сброс среды
+            # так же нужно учесть, что среда должна возвращать награду
+            # функция reset() возвращает среду в первоначальное состояние,
+            # перед началом каждого нового эпизода, для каждой env - это происходит по разному
+            # в нашем алгоритме нужно получаеть новое состояние
+            # state = agent.env.reset()
+            state = pyautogui.screenshot()
+
+            # вот здесь на вход должен приходить массив from_numpy(ndarray), который преобразовывается
+            # в тензор, потом все значения тензора приводятся к типу float. Вот здесь сложно) нужно
+            # преобразовать картинку в ndarray, какую информацию оставить неясно
             agent.state = torch.from_numpy(state).float()
             if gpu_id >= 0:
                 with torch.cuda.device(gpu_id):

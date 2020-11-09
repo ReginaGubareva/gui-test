@@ -5,12 +5,17 @@ from selenium import webdriver
 from train import train
 from selenium.webdriver import ActionChains
 
+# этот просто описывание общего алгоритма действия
+# но все будет просиходить в train и в agent
+
+
 num_of_episodes = 100
 time_step = 2
 t = 1
 t_max = 20
 was_real_done = False
 action_space = ['CLICK', 'TYPE']
+
 
 # open the site
 driver = webdriver.Chrome(fr'D:\chromedriver.exe')
@@ -36,7 +41,7 @@ for _ in range(num_of_episodes):
         print(map_of_probabilities)
 
         probabilities_per_element = "the elemtn probabilites"
-        element = "choose element from probabilities_per_element"
+        element, action = "choose element from probabilities_per_element"
         # make the action for the element
 
     # close the connection with browser
