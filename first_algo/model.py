@@ -2,7 +2,7 @@ from __future__ import division
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import norm_col_init, weights_init
+from first_algo.utils import norm_col_init, weights_init
 
 
 # Сейчас алгоритм принимает на вход num_inputs, что соответствует
