@@ -87,7 +87,6 @@ class Agent(object):
         self.rewards.append(self.reward)
         return self
 
-    # Это повторение функции action train, пока не ясно в чем отличие
     def action_test(self):
         # to avoid storing the intermediate tensors
         with torch.no_grad():

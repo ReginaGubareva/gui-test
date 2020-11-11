@@ -84,8 +84,8 @@ def train(rank, args, shared_model, optimizer, action_space):
             # функция reset() возвращает среду в первоначальное состояние,
             # перед началом каждого нового эпизода, для каждой env - это происходит по разному
             # в нашем алгоритме нужно получаеть новое состояние
-            # state = agent.env.reset()
-            state = pyautogui.screenshot()
+            state = agent.env.reset()
+            # state = pyautogui.screenshot()
 
             # вот здесь на вход должен приходить массив from_numpy(ndarray), который преобразовывается
             # в тензор, потом все значения тензора приводятся к типу float. Вот здесь сложно) нужно

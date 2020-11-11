@@ -3,7 +3,7 @@ Reinforcement Learning (A3C) using Pytroch + multiprocessing.
 The most simple implementation for continuous action.
 Author (https://morvanzhou.github.io/).
 """
-
+import pyautogui
 import torch
 import torch.nn as nn
 from utils import v_wrap, set_init, push_and_pull, record
@@ -19,9 +19,9 @@ UPDATE_GLOBAL_ITER = 10
 GAMMA = 0.9
 MAX_EP = 4000
 
-env = gym.make('CartPole-v0')
-N_S = env.observation_space.shape[0]
-N_A = env.action_space.n
+# env = gym.make('CartPole-v0')
+# N_S = env.observation_space.shape[0]
+# N_A = env.action_space.n
 
 
 class Net(nn.Module):
@@ -48,6 +48,7 @@ class Net(nn.Module):
         logits, _ = self.forward(s)
         prob = F.softmax(logits, dim=1).data
         m = self.distribution(prob)
+        print(m)
         return m.sample().numpy()[0]
 
     def loss_func(self, s, a, v_t):
@@ -65,25 +66,29 @@ class Net(nn.Module):
 
 
 class Worker(mp.Process):
-    def __init__(self, gnet, opt, global_ep, global_ep_r, res_queue, name):
+    def __init__(self, gnet, opt, global_ep, global_ep_r, res_queue, name, state):
         super(Worker, self).__init__()
         self.name = 'w%i' % name
         self.g_ep, self.g_ep_r, self.res_queue = global_ep, global_ep_r, res_queue
         self.gnet, self.opt = gnet, opt
-        self.lnet = Net(N_S, N_A)  # local network
-        self.env = gym.make('CartPole-v0').unwrapped
+        self.lnet = Net(state, )  # local network
+
 
     def run(self):
         total_step = 1
         while self.g_ep.value < MAX_EP:
-            s = self.env.reset()
+            # s = self.env.reset()
+            s = pyautogui.screenshot()
             buffer_s, buffer_a, buffer_r = [], [], []
             ep_r = 0.
             while True:
-                if self.name == 'w0':
-                    self.env.render()
+                # if self.name == 'w0':
+                #     self.env.render()
                 a = self.lnet.choose_action(v_wrap(s[None, :]))
-                s_, r, done, _ = self.env.step(a)
+                # s_, r, done, _ = self.env.step(a)
+                # Here should be an element
+                # what is s_
+                r, done, _ = make_action(coordinates, a)
                 if done: r = -1
                 ep_r += r
                 buffer_a.append(a)
