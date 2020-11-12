@@ -68,8 +68,7 @@ class Agent(object):
 
         # Здесь мы делаем действие и возвращем измененное состояние среды
         # награду, устанавливаем done, info - это лог
-        state, self.reward, self.done, self.info = self.env.step(
-            action.cpu().numpy())
+        state, self.reward, self.done, self.info = self.env.step(action.cpu().numpy(), )
 
         # torch.from_numpy(ndarray) → Tensor
         # Создает тензор из массива,в данном случае состояние должно возвращаться
@@ -111,7 +110,7 @@ class Agent(object):
         action = prob.max(1)[1].data.cpu().numpy()
 
         # TODO: change env to screenshot and step to some actions with screenshot
-        state, self.reward, self.done, self.info = self.env.step(action[0])
+        state, self.reward, self.done, self.info = self.env.step(action[0], )
         self.state = torch.from_numpy(state).float()
         if self.gpu_id >= 0:
             with torch.cuda.device(self.gpu_id):
