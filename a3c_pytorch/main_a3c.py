@@ -7,10 +7,10 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import argparse
 import torch
 import torch.multiprocessing as mp
-from first_algo.model import A3Clstm
-from first_algo.train import train
-from first_algo.test import test
-from first_algo.shared_optim import SharedRMSprop, SharedAdam
+from a3c_pytorch.model import A3Clstm
+from a3c_pytorch.train import train
+from a3c_pytorch.test import test
+from a3c_pytorch.shared_optim import SharedRMSprop, SharedAdam
 import time
 
 #undo_logger_setup()

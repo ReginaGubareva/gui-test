@@ -1,9 +1,9 @@
 from __future__ import division
 from setproctitle import setproctitle as ptitle
 import torch
-from first_algo.utils import setup_logger
-from first_algo.model import A3Clstm
-from first_algo.agent import Agent
+from a3c_pytorch.utils import setup_logger
+from a3c_pytorch.model import A3Clstm
+from a3c_pytorch.agent import Agent
 import time
 import logging
 

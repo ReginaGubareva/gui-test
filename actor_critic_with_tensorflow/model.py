@@ -11,7 +11,7 @@ class ActorCriticNetwork(keras.Model):
     # name - имя файла для чекпоинтов
     # chkpt_dir - путь до директории, чтобы хранить файлы с чекпоинтами
     def __init__(self, n_actions, fc1_dims=1024, fc2_dims=512,
-                 name='actor_critic', chkpt_dir='D:\gui-test\checkpoints_for_actor_critic'):
+                 name='actor_critic', chkpt_dir='tmp/actor_critic'):
         super(ActorCriticNetwork, self).__init__()
 
         # saving our parameters
@@ -35,7 +35,8 @@ class ActorCriticNetwork(keras.Model):
         self.pi = Dense(n_actions, activation='softmax')
 
     # our call function - really it is feed forward function
-    def call(self, state, **kwargs):
+    def call(self, state):
+        print('CALL ACTOR_CRITIC')
         value = self.fc1(state)
         value = self.fc2(value)
 
@@ -45,5 +46,3 @@ class ActorCriticNetwork(keras.Model):
 
         return v, pi
 
-    def get_config(self):
-        pass

@@ -1,7 +1,7 @@
 import time
 import pyautogui
 from selenium import webdriver
-from first_algo.train import train
+from a3c_pytorch.train import train
 from skimage.transform import resize
 import numpy as np
 

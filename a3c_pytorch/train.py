@@ -2,9 +2,9 @@ from __future__ import division
 from setproctitle import setproctitle as ptitle
 import torch
 import torch.optim as optim
-from first_algo.utils import ensure_shared_grads
-from first_algo.model import A3Clstm
-from first_algo.agent import Agent
+from a3c_pytorch.utils import ensure_shared_grads
+from a3c_pytorch.model import A3Clstm
+from a3c_pytorch.agent import Agent
 from torch.autograd import Variable
 from selenium import webdriver
 import pyautogui
