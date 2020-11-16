@@ -24,32 +24,15 @@ class Environment:
         done = False
         actions = ActionChains(self.driver)
 
-        actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0, 0)
-        if action == 'click':
-            actions.move_by_offset(coordinates[0], coordinates[1]).click()
-            s_t = pyautogui.screenshot()
-            if (s_t.isTerminal()):
-                # reward += 1
-                done = True
-            else:
-                reward -= 1
-        if action == 'type':
-            actions.move_by_offset(coordinates[0], coordinates[1]).send_keys(keys)
-            s_t = pyautogui.screenshot()
-            if (not self.isTerminal(s_t) and self.haveCredentials(s_t)):
-                reward += 1
-            else:
-                reward -= 1
 
     def reset(self):
         self.driver.get("https://www.google.com/?hl=en")
         time.sleep(3)
         state = pyautogui.screenshot()
-
         return state
 
     def isTerminal(self, state):
-        terminal_state_1 = Image.open(r'D:\gui-test\resources\terminal_state_1.PNG')
+        terminal_state_1 = Image.open(r'/resources/terminal_state.PNG')
         terminal_state_2 = Image.open(r'D:\gui-test\resources\start_state.png')
         if(open(state, "rb").read() == open(terminal_state_1,"rb").read()
                 or open(state, "rb").read() != open(terminal_state_2, "rb").read()):
