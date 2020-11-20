@@ -30,11 +30,12 @@ class Agent:
         print('CHOOSE ACTION')
         
         state = tf.convert_to_tensor([observation])
-        print('observation converted to tensor ', state)
+        # print('observation converted to tensor ', state)
 
         # getting probability
         _, probs = self.actor_critic(state)
         print('probs from actor_critic(state)', probs)
+
 
         # Then we can use prob output to feed it to the actual tensorflow
         # probabilities categorical distribution and the we use it to select
@@ -45,9 +46,9 @@ class Agent:
 
         # actual action will be a sample of the distribution action_probabilities
         action = action_probabilities.sample()
-        print('get action as action_probabilities.sample()', action)
+        # print('get action as action_probabilities.sample()', action)
         log_prob = action_probabilities.log_prob(action)
-        print('log_prob from action', log_prob)
+        # print('log_prob from action', log_prob)
 
         # for action to be selected we save in action variable
         self.action = action
@@ -57,7 +58,7 @@ class Agent:
         # we take a numpy array and get the zeroth element of that because added in batch
         # dimension for compatibility with our neural network
         print('return from choose action is numpy version of Action: ', action.numpy()[0])
-        return action.numpy()[0]
+        return state, action.numpy()[0]
 
     # a couple functions to save and load models
     def save_models(self):

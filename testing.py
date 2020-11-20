@@ -5,16 +5,28 @@ import cv2
 from selenium import webdriver
 import numpy as np
 import pytesseract
+
+from actor_critic_outer_env.agent import Agent
 from actor_critic_outer_env.environment import WebEnv
 
-#
+
+# env = WebEnv()
+# action_space = env.action_space
+# print(len(action_space))
+agent = Agent(alpha=1e-5, n_actions=2)
+observation = cv2.imread(fr'D:\gui-test\resources\initial.png')
+action = agent.choose_action(observation)
+
+
+
 # selenium_driver = webdriver.Chrome(fr'D:\chromedriver.exe')
 # selenium_driver.get('https://digital.sberbank.kz/customer/login')
 
 
-# GET SCREENSHOT FROM ENV
-env = WebEnv()
+# Need to get coords element from action
 
+# GET SCREENSHOT FROM ENV
+# env = WebEnv()
 
 # time.sleep(5)
 # screen, counter = env.get_screen(0)
@@ -49,7 +61,7 @@ env = WebEnv()
 # #
 # # # click
 # counter = env.step(button, 'click', counter)
-print(env.isTerminal())
+# print(env.is_terminal())
 
 # CHECK WILL THE SCREEN BY SELENIUM BE THE SAME?
 # state_, reward, done = env.step()
@@ -76,7 +88,6 @@ print(env.isTerminal())
 # else:
 #     cv2.imwrite(fr'resources\ed.jpg', difference )
 #     print("Pictures are different, the difference is stored as ed.jpg")
-
 
 
 # TEST SCREENSHOT SAVING
