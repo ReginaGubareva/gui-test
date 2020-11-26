@@ -7,15 +7,15 @@ from actor_critic_with_tensorflow.utils import plot_learning_curve
 
 if __name__ == '__main__':
 
-    print('MAIN')
     # make our environment
     env = gym.make('CartPole-v0')
+
     # print('make environment: ', env)
     # define our Agent,
     # aplha - learning rate
     # number of actions defined by our environment
     agent = Agent(alpha=1e-5, n_actions=env.action_space.n)
-    print('set agent: alpha=1e-5,  n_actions=', env.action_space.n)
+
     # set number of games
     n_games = 1500
     # print('number of games: ', n_games)
@@ -37,9 +37,7 @@ if __name__ == '__main__':
         agent.load_models()
 
     # start playing our games
-    print('START PLAYING')
     for i in range(n_games):
-        # print('Game #', i)
         # reset our environment
         observation = env.reset()
         # print('observation: ', observation)
@@ -54,19 +52,16 @@ if __name__ == '__main__':
         # we can choose action
         while not done:
             action = agent.choose_action(observation)
-            # print('action from choose_action: ', action)
+
             # get the new state, reward, done and info
             observation_, reward, done, info = env.step(action)
-            # print('new observation_: ', observation_)
-            # print('reward after action: ', reward)
+
             # increment our score
             score += reward
-            # print('score: ', score)
+       
             # if it not load_checkpoint then we want to learn
             if not load_checkpoint:
-               # print('agent learn')
                 agent.learn(observation, reward, observation_, done)
-
 
             # either way we want to set the current state to the new state
             # otherwise you will be constantly choosing an action based on
@@ -84,7 +79,7 @@ if __name__ == '__main__':
             if not load_checkpoint:
                 agent.save_models()
 
-        # _logger.info('episode ', i, 'score %.1f ' % score, 'avg_score %.1f' % avg_score)
+        print('episode ', i, 'score %.1f ' % score, 'avg_score %.1f' % avg_score)
 
     # in the end just plot
     # x axis

@@ -21,7 +21,6 @@ if __name__ == '__main__':
     # change our open ai gym environment on our website
     env = WebEnv()
 
-
     # change our inner env action space to our action space
     action_space = env.action_space
 
@@ -36,8 +35,8 @@ if __name__ == '__main__':
     # print('number of episodes: ', n_episodes)
 
     # to save plot for checking learning
-    filename = 'serbusiness.png'
-    figure_file = fr'plots\serbusiness.png'
+    filename = 'sberbusiness.png'
+    figure_file = fr'plots\sberbusiness.png'
 
     # to keep track the best score recieved
     # it will default to the lowest range
@@ -60,14 +59,7 @@ if __name__ == '__main__':
     # start playing our games
     print('START LEARNING')
     for i in range(n_episodes):
-        # print('Episode #', i)
-
-        # reset our environment
-        # observation = env.reset()
-        # print('observation: ', observation)
-
-        # change env.reset() to new screenshot
-        observation = WebEnv.reset()
+        observation = WebEnv.reset(env)
 
         # set our terminal flag
         done = False
@@ -78,8 +70,8 @@ if __name__ == '__main__':
         # while not done with the episode
         # we can choose action
         while not done:
-            # TODO: maybe we need to change the choose_action function to return coords of action
-            element, action = agent.choose_action(observation)
+
+            coords, action = agent.choose_action(observation)
             # print('action from choose_action: ', action)
 
             # get the new state, reward, done and info
@@ -90,37 +82,39 @@ if __name__ == '__main__':
             # we need to write our own env.step(action) function
             # but it should get coordinates of the action
             counter = 0
-            observation_, reward, done, info, counter = env.step(element, action, counter)
+            for k in range(len(coords)):
+                # TODO: change element to coords
+                observation_, reward, done, info, counter = env.step(coords[k], action, counter)
+                # increment our score
+                score += reward
 
-            # increment our score
-            score += reward
-            # print('score: ', score)
-            # if it not load_checkpoint then we want to learn
+                # print('score: ', score)
+                # if it not load_checkpoint then we want to learn
+                if not load_checkpoint:
+                   # print('agent learn')
+                    agent.learn(observation, reward, observation_, done)
+
+                # either way we want to set the current state to the new state
+                # otherwise you will be constantly choosing an action based on
+                # initial state of the environment which obviously will not work
+                observation = observation_
+
+            # append the score to the store_history to plot the purposes and
+            # calculate an average score of previous hundred games
+            score_history.append(score)
+            avg_score = np.mean(score_history[-100:])
+            # print('average score: ', avg_score)
+            # if that average score is better then new best score
+            if avg_score > best_score:
+                # set the best score to the average score
+                best_score = avg_score
+                if not load_checkpoint:
+                    agent.save_models()
+
+            print('episode ', i, 'score %.1f ' % score, 'avg_score %.1f' % avg_score)
+
+            # in the end just plot
+            # x axis
             if not load_checkpoint:
-               # print('agent learn')
-                agent.learn(observation, reward, observation_, done)
-
-
-            # either way we want to set the current state to the new state
-            # otherwise you will be constantly choosing an action based on
-            # initial state of the environment which obviously will not work
-            observation = observation_
-        # append the score to the store_history to plot the purposes and
-        # calculate an average score of previous hundred games
-        score_history.append(score)
-        avg_score = np.mean(score_history[-100:])
-        # print('average score: ', avg_score)
-        # if that average score is better then new best score
-        if avg_score > best_score:
-            # set the best score to the average score
-            best_score = avg_score
-            if not load_checkpoint:
-                agent.save_models()
-
-    print('episode ', i, 'score %.1f ' % score, 'avg_score %.1f' % avg_score)
-
-    # in the end just plot
-    # x axis
-    if not load_checkpoint:
-        x = [i + 1 for i in range(n_episodes)]
-        plot_learning_curve(x, score_history, figure_file)
+                x = [i + 1 for i in range(n_episodes)]
+                plot_learning_curve(x, score_history, figure_file)

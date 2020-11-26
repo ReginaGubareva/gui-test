@@ -1,8 +1,12 @@
+import random
+
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 import tensorflow_probability as tfp
-from actor_critic_with_tensorflow.model import  ActorCriticNetwork
+from actor_critic_with_tensorflow.model import ActorCriticNetwork
 import numpy as np
+import imutils
+import cv2
 
 class Agent:
     # alpha - learning rate
@@ -28,44 +32,49 @@ class Agent:
     # observation - current state of the environment
     def choose_action(self, observation):
         print('CHOOSE ACTION')
+        action_space = ['click', 'type']
+        gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)
+        yx_coords = np.column_stack(np.where(gray >= 0))
+        print(yx_coords)
+        action = []
 
-        state = tf.convert_to_tensor([observation])
-        print('observation converted to tensor ', state)
-        print(state.shape)
-        print(len(state))
-        print(state.ndim)
-        print(state.numpy()[0])
+        for i in range(yx_coords):
+            action.append(random.choice(action_space))
+            print('coords: ', yx_coords[i], 'action: ', action)
 
+        return yx_coords, action
+
+        # state = tf.convert_to_tensor([observation])
         # getting probability
-        _, probs = self.actor_critic(state)
-        # print('probs from actor_critic(state)', probs)
-        # print('state: ', _[0], 'probs: ', probs[0])
-        # Then we can use prob output to feed it to the actual tensorflow
-        # probabilities categorical distribution and the we use it to select
-        # an action by sampling that distribution ang getting a log probability
-        # of selecting that sample
-        action_probabilities = tfp.distributions.Categorical(probs=probs)
-        # print('action_probabilties: ', action_probabilities)
+        # _, probs = self.actor_critic(state)
+        # # print('probs from actor_critic(state)', probs)
+        # # print('state: ', _[0], 'probs: ', probs[0])
+        # # Then we can use prob output to feed it to the actual tensorflow
+        # # probabilities categorical distribution and the we use it to select
+        # # an action by sampling that distribution ang getting a log probability
+        # # of selecting that sample
+        # action_probabilities = tfp.distributions.Categorical(probs=probs)
+        # # print('action_probabilties: ', action_probabilities)
+        #
+        # # actual action will be a sample of the distribution action_probabilities
+        # action = action_probabilities.sample()
+        # print('action')
+        # print(action.shape)
+        # print(len(action))
+        # print(action.ndim)
+        # # print('get action as action_probabilities.sample()', action)
+        # log_prob = action_probabilities.log_prob(action)
+        #
+        # # for action to be selected we save in action variable
+        # self.action = action
+        # print('action.numpy()[0]')
+        # print(list(action.numpy()[0]))
+        # # return numpy version of our action because our action is tensorflow tensor
+        # # and it is not compatible with the open ai gym
+        # # we take a numpy array and get the zeroth element of that because added in batch
+        # # dimension for compatibility with our neural network
 
-        # actual action will be a sample of the distribution action_probabilities
-        action = action_probabilities.sample()
-        print('action')
-        print(action.shape)
-        print(len(action))
-        print(action.ndim)
-        # print('get action as action_probabilities.sample()', action)
-        log_prob = action_probabilities.log_prob(action)
-
-        # for action to be selected we save in action variable
-        self.action = action
-        print('action.numpy()[0]')
-        print(action.numpy()[0])
-        # return numpy version of our action because our action is tensorflow tensor
-        # and it is not compatible with the open ai gym
-        # we take a numpy array and get the zeroth element of that because added in batch
-        # dimension for compatibility with our neural network
-
-        return action.numpy()[0]
+        # return action
 
     # a couple functions to save and load models
     def save_models(self):
