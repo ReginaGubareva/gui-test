@@ -36,7 +36,6 @@ class ActorCriticNetwork(keras.Model):
 
     # our call function - really it is feed forward function
     def call(self, state):
-        print('CALL ACTOR_CRITIC')
         value = self.fc1(state)
         value = self.fc2(value)
 
