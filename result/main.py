@@ -39,11 +39,12 @@ if __name__ == '__main__':
         counter, observation = env.get_screen(counter)
         done = False
         score = 0
-        while not done:
-            for j in range(256):
+        j = 0
+        while not done or j < 256:
                 action = agent.choose_action(observation)
                 observation_, reward, done, counter = env.step(action, c[j], counter)
                 score += reward
+                j += 1
                 if not load_checkpoint:
                     agent.learn(observation, reward, observation_, done)
                 observation = observation_
