@@ -48,15 +48,17 @@ class Environment:
         img = pyautogui.screenshot(region=(320, 545, 445, 265))
         observation = img.convert('L').resize((256, 256))
         filename = "%d" % counter
-        observation.save(fr'resources\learning_screens\{filename}.png')
+        observation.save(fr'D:\gui-test\result\resources\learning_screens\{filename}.png')
         counter += 1
         return counter, observation
 
     @staticmethod
     def isTerminal(state):
-        terminal = Image.open(fr'D:\gui-test\resources\terminal.png')
+        terminal = Image.open(fr'D:\gui-test\result\resources\terminal.png')
+        terminal = tf.keras.preprocessing.image.img_to_array(terminal, data_format=None, dtype=None)
         arr1 = np.array(terminal)
-        arr2 = np.array(state)
+        state = tf.keras.preprocessing.image.img_to_array(state, data_format=None, dtype=None)
+        arr2 = np.asarray(state)
         return np.array_equal(arr1, arr2)
 
 

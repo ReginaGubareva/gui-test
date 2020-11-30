@@ -2,7 +2,7 @@ from result.agent import Agent
 from result.utils import plot_learning_curve
 import numpy as np
 import tensorflow as tf
-from actor_critic_keras.environment import Environment
+from result.environment import Environment
 
 if __name__ == '__main__':
     tf.config.run_functions_eagerly(True)
@@ -34,17 +34,19 @@ if __name__ == '__main__':
         agent.load_models()
 
     for i in range(num_episodes):
-        observation = env.reset()
+        counter = 0
+        env.reset()
+        counter, observation = env.get_screen(counter)
         done = False
         score = 0
-        counter = 0
         while not done:
-            action = agent.choose_action(observation)
-            observation_, reward, done, counter = env.step(action, c[i], counter)
-            score += reward
-            if not load_checkpoint:
-                agent.learn(observation, reward, observation_, done)
-            observation = observation_
+            for j in range(256):
+                action = agent.choose_action(observation)
+                observation_, reward, done, counter = env.step(action, c[j], counter)
+                score += reward
+                if not load_checkpoint:
+                    agent.learn(observation, reward, observation_, done)
+                observation = observation_
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
 

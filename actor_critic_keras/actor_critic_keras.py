@@ -47,18 +47,17 @@ class Agent(object):
 
         return actor, critic, policy
 
-    # def choose_action(self, observation):
-    #     state = observation[np.newaxis, :]
-    #     probabilities = self.policy.predict(state)[0]
-    #     print('probabilites', probabilities)
-    #     print('make probabilities')
-    #     action = np.random.choice(self.action_space, p=probabilities)
-    #     return action
+    def choose_action(self, observation):
+        state = observation[np.newaxis, :]
+        print('state', state)
+        probabilities = self.policy.predict(state)[0]
+        print('probabilites', probabilities)
+        print('make probabilities')
+        action = np.random.choice(self.action_space, p=probabilities)
+        return action
 
-    def choose_ation(self, observation, action_space):
-        print('CHOOSE ACTION')
-
-
+    # def choose_ation(self, observation, action_space):
+    #     print('CHOOSE ACTION')
 
     def learn(self, state, action, reward, state_, done):
         state = state[np.newaxis,:]

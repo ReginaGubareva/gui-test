@@ -1,8 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 import tensorflow_probability as tfp
-from actor_critic_with_tensorflow.model import  ActorCriticNetwork
-
+from result.model import  ActorCriticNetwork
+import random
+from sklearn.preprocessing import normalize
+import numpy as np
 
 class Agent:
     def __init__(self, alpha=0.0003, gamma=0.99, n_actions=2):
@@ -15,19 +17,26 @@ class Agent:
 
 
     def choose_action(self, observation):
-        state = tf.convert_to_tensor([observation])
+        # action_space = ['click', 'type']
+        # state = tf.keras.preprocessing.image.img_to_array(observation)
+        state = self.convert_img_to_tensor(observation)
+        state = tf.convert_to_tensor(state)
         _, probs = self.actor_critic(state)
-
+        print('probs', probs)
         action_probabilities = tfp.distributions.Categorical(probs=probs)
         print('probs', action_probabilities)
         action = action_probabilities.sample()
         log_prob = action_probabilities.log_prob(action)
         self.action = action
-        print('action', action.numpy())
+        print('action', action.numpy()[0])
         if action.numpy()[0] == 0:
             return 'click'
         else:
             return 'type'
+
+        # action = random.choice(action_space)
+        # print('action', action.numpy()[0])
+
 
     def save_models(self):
         print('... saving models ...')
@@ -40,8 +49,13 @@ class Agent:
 
 
     def learn(self, state, reward, state_, done):
-        state = tf.convert_to_tensor([state], dtype=tf.float32)
-        state_ = tf.convert_to_tensor([state_], dtype=tf.float32)
+        # state = tf.convert_to_tensor([state], dtype=tf.float32)
+        state = self.convert_img_to_tensor(state)
+        state = tf.convert_to_tensor(state)
+
+        state_ = self.convert_img_to_tensor(state_)
+        state_ = tf.convert_to_tensor(state_)
+
         reward = tf.convert_to_tensor(reward, dtype=tf.float32)
 
         with tf.GradientTape(persistent=True) as tape:
@@ -62,3 +76,19 @@ class Agent:
         gradient = tape.gradient(total_loss, self.actor_critic.trainable_variables)
         self.actor_critic.optimizer.apply_gradients(zip(
             gradient, self.actor_critic.trainable_variables))
+
+
+    def convert_img_to_tensor(self, state):
+        state = np.array(state)
+        shape = state.shape
+        normalized_metrics = normalize(state, axis=0, norm='l1')
+        # flat_arr = state.ravel()
+        # result_arr = []
+        # for i in range(len(flat_arr)):
+        #     print('arr[i]', flat_arr[i], float(flat_arr[i]) / float(255))
+        #     result_arr.append(float(flat_arr[i]) / float(255))
+        #
+        # for i in range(len(result_arr)):
+        #     print('result_arr', result_arr[i])
+
+        return normalized_metrics

@@ -16,10 +16,12 @@ import numpy as np
 # from selenium.webdriver.chrome.options import Options
 import webbrowser
 import pyautogui
+from tensorflow.python.keras.layers import GlobalAveragePooling2D, Dense
+from tensorflow.python.keras.models import Model
+
 from actor_critic_keras.actor_critic_keras import Agent
 from environment_pyautogui import Environment
 from PIL import ImageChops
-
 
 # pyautogui.moveTo(350, 555)
 # pyautogui.click()
@@ -37,22 +39,69 @@ from PIL import ImageChops
 # print(state)
 
 
-
-
 env = Environment()
-time.sleep(25)
-env.reset()
+time.sleep(10)
+# terminal = Image.open(fr'D:\gui-test\resources\terminal.png')
+# terminal = tf.keras.preprocessing.image.img_to_array(terminal, data_format=None, dtype=None)
+# terminal = np.array(terminal)
+# print(terminal)
+counter = 0
+counter, state = env.get_screen(counter)
+array = tf.keras.preprocessing.image.img_to_array(state)
+
+# from keras.applications.resnet50 import ResNet50
+#
+# base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(256, 256, 3))
+# x = base_model.output
+# print('x', x)
+# x = GlobalAveragePooling2D()(x)
+# x = Dense(10, activation='softmax')(x)
+# model = Model(base_model.input, x)
+# print('model', model)
 
 
-x = []
-y = []
-n = 256 * 256
+state = np.array(state)
+print('state', state)
+normalized_metrics = normalize(state, axis=0, norm='l1')
+print('norm', normalized_metrics)
+# for i in range(state[0]):
+#     for j in range(state[0]):
+#         state[i][j] = float(state[i][j])/float(255)
 
-for i in range(256):
-    x.append(i)
-    y.append(i)
 
-c = [[x0, y0] for x0 in x for y0 in y]
+print(state)
+# arr = np.array(state)
+# print('array', arr)
+# shape = arr.shape
+# print('shape', shape)
+# flat_arr = arr.ravel()
+# print('flat_arr', flat_arr)
+# result_arr = []
+# for i in range(len(flat_arr)):
+#     print('arr[i]', flat_arr[i], float(flat_arr[i])/float(255))
+#     result_arr.append(float(flat_arr[i])/float(255))
+#
+# for i in range(len(result_arr)):
+#     print('result_arr', result_arr[i])
+
+
+
+# print(env.isTerminal(state))
+# print(np.array(state))
+# tensor = tf.convert_to_tensor(state)
+# print(tensor)
+# env.reset()
+#
+#
+# x = []
+# y = []
+# n = 256 * 256
+#
+# for i in range(256):
+#     x.append(i)
+#     y.append(i)
+#
+# c = [[x0, y0] for x0 in x for y0 in y]
 #
 # i = 0
 # score = 0

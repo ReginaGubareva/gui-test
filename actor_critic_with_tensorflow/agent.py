@@ -29,6 +29,7 @@ class Agent:
     def choose_action(self, observation):
         print('observation', observation)
         state = tf.convert_to_tensor([observation])
+        print('state', state)
         _, probs = self.actor_critic(state)
 
         action_probabilities = tfp.distributions.Categorical(probs=probs)
