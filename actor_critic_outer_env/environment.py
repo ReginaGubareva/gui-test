@@ -6,13 +6,14 @@ from selenium.webdriver.common import keys
 import cv2
 import time
 import numpy as np
-
+import webbrowser
+import pyautogui
 
 class WebEnv:
     def __init__(self):
         self.action_space = ['click', 'type']
-        self.driver = webdriver.Chrome(fr'D:\chromedriver.exe')
-        self.driver.get('https://digital.sberbank.kz/customer/login')
+        self.url = fr'https://digital.sberbank.kz/customer/login'
+        webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open(self.url)
         time.sleep(5)
 
     # this function reset environment to the initial state
@@ -66,7 +67,7 @@ class WebEnv:
                 reward = 1
                 return state_, reward, done, 'Learning is going', counter
         if action == 'type':
-            actions.move_by_offset(coords.get('x') + 1, coords.get('y') + 1).send_keys('admin')
+            actions.move_by_offset(coords[0], coords[1]).send_keys("admin")
             # element.send_keys("admin")
             time.sleep(3)
             state_ = self.get_screen(counter)

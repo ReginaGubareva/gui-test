@@ -14,10 +14,8 @@ import time
 
 if __name__ == '__main__':
 
-    print('MAIN')
     # make our environment
     # env = gym.make('CartPole-v0')
-    # print('make environment: ', env)
     # change our open ai gym environment on our website
     env = WebEnv()
 
@@ -103,7 +101,6 @@ if __name__ == '__main__':
             # calculate an average score of previous hundred games
             score_history.append(score)
             avg_score = np.mean(score_history[-100:])
-            # print('average score: ', avg_score)
             # if that average score is better then new best score
             if avg_score > best_score:
                 # set the best score to the average score

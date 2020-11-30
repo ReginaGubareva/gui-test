@@ -2,11 +2,13 @@ from keras import backend as K
 from keras.layers import Dense, Activation, Input
 from keras.models import Model, load_model
 from keras.optimizers import Adam
+import tensorflow as tf
 import numpy as np
+import random
 
 
 class Agent(object):
-    def __init__(self, alpha, beta, gamma=0.99, n_actions=4,
+    def __init__(self, alpha, beta, gamma=0.99, n_actions=2,
                  layer1_size=1024, layer2_size=512, input_dims=8):
         self.gamma = gamma
         self.alpha = alpha
@@ -45,12 +47,18 @@ class Agent(object):
 
         return actor, critic, policy
 
-    def choose_action(self, observation):
-        state = observation[np.newaxis, :]
-        probabilities = self.policy.predict(state)[0]
-        action = np.random.choice(self.action_space, p=probabilities)
+    # def choose_action(self, observation):
+    #     state = observation[np.newaxis, :]
+    #     probabilities = self.policy.predict(state)[0]
+    #     print('probabilites', probabilities)
+    #     print('make probabilities')
+    #     action = np.random.choice(self.action_space, p=probabilities)
+    #     return action
 
-        return action
+    def choose_ation(self, observation, action_space):
+        print('CHOOSE ACTION')
+
+
 
     def learn(self, state, action, reward, state_, done):
         state = state[np.newaxis,:]

@@ -1,35 +1,108 @@
+# import os
 import random
 import time
 import tensorflow as tf
 import cv2
-# from PIL import Image
-from selenium import webdriver
+from PIL import Image
+# from selenium import webdriver
 import numpy as np
-import pytesseract
-import imutils
-from actor_critic_outer_env.agent import Agent
-from actor_critic_outer_env.environment import WebEnv
-from itertools import product
-import pandas as pd
-
-rows_count = 256
-cols_count = 2
-action_space = ['click', 'type']
-coords = [[0 for j in range(cols_count)] for i in range(rows_count)]
-for i in range(rows_count):
-    for j in range(256):
-        coords[i][0] = i
-        coords[i][1] = j
-
-print(coords)
+# import pytesseract
+# import imutils
+# from actor_critic_outer_env.agent import Agent
+# from actor_critic_outer_env.environment import WebEnv
+# from itertools import product
+# import pandas as pd
+# from selenium.webdriver import ActionChains
+# from selenium.webdriver.chrome.options import Options
+import webbrowser
+import pyautogui
+from actor_critic_keras.actor_critic_keras import Agent
+from environment_pyautogui import Environment
+from PIL import ImageChops
 
 
-# for i in range(len(yx_coords)):
-#     action = random.choice(action_space)
-#     print('coords: ', yx_coords[i], 'action: ', action)
-# random_action = random.choice(action_space)
+# pyautogui.moveTo(350, 555)
+# pyautogui.click()
+# pyautogui.write('admin')
+# time.sleep(2)
+# pyautogui.moveTo(350, 670)
+# pyautogui.click()
+# pyautogui.write('admin')
+# time.sleep(2)
+# pyautogui.moveTo(350, 770)
+# pyautogui.click()
+# time.sleep(2)
+
+# state = tf.keras.preprocessing.image.img_to_array(observation, data_format=None, dtype=None)
+# print(state)
+
+
+
+
+env = Environment()
+time.sleep(25)
+env.reset()
+
+
+x = []
+y = []
+n = 256 * 256
+
+for i in range(256):
+    x.append(i)
+    y.append(i)
+
+c = [[x0, y0] for x0 in x for y0 in y]
+#
+# i = 0
+# score = 0
+# counter = 0
+# while i < 256:
+#     action = random.choice(env.action_space)
+#     state_, reward, done, counter = env.step(action, c[i], counter)
+#     score += reward
+#     if done == True:
+#         break
+#     print('episode', i, 'action: ', action, 'score: ', score)
+#     i += 1
+
+# print(env.equal(terminal, initial))
+
+# if(env.isTerminal(env, screen)):
+#     print("Done")
+
+# ********** TEST STEP **********
+
+# observation_, reward, done, info = env.step(action)
+# pyautogui.moveTo(132, 323)
+# pyautogui.write('admin')
+# pyautogui.moveTo(132, 394)
+# pyautogui.click()
+
+# ********** TEST CREATE ARRAY OF COORDINATES  **********
+
+
 # env = WebEnv()
-# env.step(yx_coords[1], random_action, 0)
+# env.step([133, 405], 'click', 2)
+# options = Options()
+# options.add_argument(fr"--load-extension=C:\Users\rengu\AppData\Local\Google\Chrome\User "
+#                      fr"Data\Default\Extensions\bihmplhobchoageeokmgbdihknkjbknd\4.1.0_0\manifest.json")
+
+
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.add_argument('--proxy-server=1.2.3.4:8080')
+
+# selenium_driver = webdriver.Chrome(fr'D:\chromedriver.exe')
+# selenium_driver.get('https://digital.sberbank.kz/customer/login')
+# time.sleep(5)
+# actions = ActionChains(selenium_driver)
+#
+# actions.move_by_offset(132 + 2, 262 + 2).send_keys("admin").perform()
+# time.sleep(2)
+# actions.move_by_offset(132+2, 343+2).send_keys("admin").perform()
+# time.sleep(2)
+# actions.move_by_offset(132 + 3, 404 + 3).click().perform()
+
 
 # # ********** TEST GET COORDINATES FROM IMAGE **********
 # observation = cv2.imread(fr'D:\gui-test\resources\initial.png')
@@ -70,6 +143,7 @@ print(coords)
 # print('button location: ', button.location)
 # print('button coords X: ', button.location.get('x'))
 # print('button coords Y: ', button.location.get('y'))
+# button.click()
 
 # ********** TESTING STEP FUNCTION **********
 # counter = 0
@@ -83,7 +157,7 @@ print(coords)
 # ********** READ TEXT IN IMAGES WITH CV2 AND PYTESSERACT **********
 # pytesseract.pytesseract.tesseract_cmd = fr'C:\Users\rengu\.conda\envs\guit-test-python\tesseract.exe'
 # terminal = cv2.imread(fr'D:\gui-test\resources\terminal_state.png')
-# screen = cv2.imread(fr'D:\gui-test\resources\learning_screens\0.png')
+# screen = cv2.imread(fr'D:\gui-test\resources\learning_screens\terminal.png')
 # terminal2 = cv2.imread(fr'D:\gui-test\resources\terminal_state_grey.png')
 # text = pytesseract.image_to_string(terminal)
 # text2 = pytesseract.image_to_string(terminal2)
@@ -112,7 +186,7 @@ print(coords)
 # counter = 0
 # filename = "%d" % counter
 # state = element.screenshot(fr'resources\learning_screens\{filename}.png')
-# initial_state = Image.open(fr'D:\gui-test\resources\0.png')
+# initial_state = Image.open(fr'D:\gui-test\resources\terminal.png')
 # resize_state = initial_state.resize((256, 256))
 # greyscale_state = resize_state.convert('L')
 # greyscale_state.save(fr'resources\terminal_state_grey.png')

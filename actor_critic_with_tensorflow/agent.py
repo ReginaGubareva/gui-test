@@ -27,29 +27,15 @@ class Agent:
     # the basic functionality to choose an action
     # observation - current state of the environment
     def choose_action(self, observation):
+        print('observation', observation)
         state = tf.convert_to_tensor([observation])
-
-        # getting probability
         _, probs = self.actor_critic(state)
 
-        # Then we can use prob output to feed it to the actual tensorflow
-        # probabilities categorical distribution and the we use it to select
-        # an action by sampling that distribution ang getting a log probability
-        # of selecting that sample
         action_probabilities = tfp.distributions.Categorical(probs=probs)
-
-        # actual action will be a sample of the distribution action_probabilities
+        print('probs', action_probabilities)
         action = action_probabilities.sample()
-        # print('get action as action_probabilities.sample()', action)
         log_prob = action_probabilities.log_prob(action)
-
-        # for action to be selected we save in action variable
         self.action = action
-
-        # return numpy version of our action because our action is tensorflow tensor
-        # and it is not compatible with the open ai gym
-        # we take a numpy array and get the zeroth element of that because added in batch
-        # dimension for compatibility with our neural network
         return action.numpy()[0]
 
     # a couple functions to save and load models

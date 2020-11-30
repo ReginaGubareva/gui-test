@@ -17,7 +17,7 @@ if __name__ == '__main__':
     agent = Agent(alpha=1e-5, n_actions=env.action_space.n)
 
     # set number of games
-    n_games = 1500
+    n_games = 15
     # print('number of games: ', n_games)
     filename = 'cartpole.png'
     figure_file = fr'plots\cartpole.png'
