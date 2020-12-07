@@ -1,27 +1,145 @@
-# import os
-import random
 import time
-import tensorflow as tf
 import cv2
-from PIL import Image
-# from selenium import webdriver
+import matplotlib
 import numpy as np
-# import pytesseract
-# import imutils
-# from actor_critic_outer_env.agent import Agent
-# from actor_critic_outer_env.environment import WebEnv
-# from itertools import product
-# import pandas as pd
-# from selenium.webdriver import ActionChains
-# from selenium.webdriver.chrome.options import Options
-import webbrowser
-import pyautogui
-from tensorflow.python.keras.layers import GlobalAveragePooling2D, Dense
-from tensorflow.python.keras.models import Model
 
-from actor_critic_keras.actor_critic_keras import Agent
-from environment_pyautogui import Environment
-from PIL import ImageChops
+# ******** GET GUI ELEMENTS COUNTUR ********
+image_path = fr"D:\gui-test\test.png"
+im = cv2.imread(image_path)
+im_copy = im.copy()
+im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+ret, thresh = cv2.threshold(im_gray, 235, 255, cv2.THRESH_BINARY_INV)
+cv2.imshow(fr'D:\gui-test\contours.png', thresh)
+cv2.waitKey(0)
+
+contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+print("Number of Contours found = " + str(len(contours)))
+
+# Draw all contours
+# for i in range(len(contours)):
+#     cnt = contours[i]
+#     cv2.drawContours(im_copy, [cnt], 0, (0, 0, 255), 2)
+
+# cnt = contours[3]
+# cv2.drawContours(im_copy, [cnt], 0, (255, 0, 0), 2)
+cv2.imshow('Contours', im_copy)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# ******** GET GUI ELEMENTS CENTROID ********
+M = cv2.moments(thresh)
+cX = int(M["m10"] / M["m00"])
+cY = int(M["m01"] / M["m00"])
+
+# cv2.circle(im_copy, (cX, cY), 5, (255, 0, 0), 2)
+# cv2.putText(im_copy, "centroid", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+
+centroids = []
+for i in range(len(contours)):
+    Cx = 0
+    Cy = 0
+    for j in range(len(contours[i])):
+        Cx += contours[i][j][0][0]
+        Cy += contours[i][j][0][1]
+
+    Cx = int(Cx / len(contours[i]))
+    Cy = int(Cy / len(contours[i]))
+
+    C = [Cx, Cy]
+    centroids.append(C)
+
+print(centroids)
+
+for i in range(len(centroids)):
+    cX = centroids[i][0]
+    cY = centroids[i][1]
+    cv2.circle(im_copy, (cX, cY), 5, (255, 0, 0), 1)
+
+# cv2.circle(im_copy, (221, 218), 5, (255, 0, 0), 1)
+# cv2.circle(im_copy, (201, 192), 5, (0, 255, 0), 1)
+# cv2.circle(im_copy, (151, 192), 5, (0, 0, 255), 1)
+# cv2.circle(im_copy, (52, 194), 5, (255, 0, 0), 1)
+# cv2.circle(im_copy, (111, 105), 5, (0, 255, 0), 1)
+# cv2.circle(im_copy, (121, 26), 5, (0, 0, 255), 1)
+
+cv2.imshow("Image", im_copy)
+cv2.waitKey(0)
+# ******** GET GUI CONTOURS WITH MASK ********
+# image = cv2.imread(image_path)
+# imgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#
+# (thresh, blackAndWhiteImage) = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+# cv2.imshow('Black white image', blackAndWhiteImage)
+# ret, thresh = cv2.threshold(imgray, 127, 255, 0)
+# print('thresh', thresh)
+# im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+# cv2.drawContours(image, contours, -1, (0, 255, 0), 3)
+# lower = np.array([0, 0, 0])
+# upper = np.array([255, 255, 255])
+# shapeMask = cv2.inRange(image, lower, upper)
+# print(shapeMask[0])
+
+# ******** FLOOD FILL ********
+# flood = thresh1
+# seed = (150, 50)
+# cv2.floodFill(flood, None, seedPoint=seed, newVal=(36, 25, 12), loDiff=(0, 255, 0, 0), upDiff=(0, 255, 0, 0))
+# cv2.circle(flood, seed, 2, (36, 25, 12), cv2.FILLED, cv2.LINE_AA);
+# cv2.imshow('flood', flood)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
+
+# ******** MAKE SCREENSHOT ********
+# import pyautogui
+# from result.environment import Environment
+# from PIL import Image
+# import PIL
+#
+# env = Environment()
+# time.sleep(10)
+# image = pyautogui.screenshot(region=(320, 545, 445, 265))
+# im = image.resize((224, 224))
+# im.save(fr"D:\gui-test\test.png")
+
+
+# counter = 0
+# counter, state = env.get_screen(counter)
+#
+# x = []
+# y = []
+# n = 256 * 256
+#
+# for i in range(256):
+#     x.append(i)
+#     y.append(i)
+#
+# c = [[x0, y0] for x0 in x for y0 in y]
+#
+# i = 0
+# score = 0
+# counter = 0
+# while i < 256:
+#     action = random.choice(env.action_space)
+#     if action == 'type' and counter >= 1:
+#         j = 256 - i
+#         while j < 256:
+#             c[j][1] = c[j][1] + 50
+#             j += 1
+#     state_, reward, done, counter = env.step(action, c[i], counter)
+#     score += reward
+#     if done == True:
+#         break
+#     print('episode', i, 'action: ', action, 'score: ', score)
+#     i += 1
+
+
+# image = Image.open(fr"result\resources\learning_screens\0.png")
+# strs = pytesseract.image_to_string(image)
+# strs = unidecode(strs)
+# str = "Hepephi nome vit naponis"
+# if strs.__contains__(str):
+#     print(True)
+
 
 # pyautogui.moveTo(350, 555)
 # pyautogui.click()
@@ -39,15 +157,12 @@ from PIL import ImageChops
 # print(state)
 
 
-env = Environment()
-time.sleep(10)
 # terminal = Image.open(fr'D:\gui-test\resources\terminal.png')
 # terminal = tf.keras.preprocessing.image.img_to_array(terminal, data_format=None, dtype=None)
 # terminal = np.array(terminal)
 # print(terminal)
-counter = 0
-counter, state = env.get_screen(counter)
-array = tf.keras.preprocessing.image.img_to_array(state)
+
+# array = tf.keras.preprocessing.image.img_to_array(state)
 
 # from keras.applications.resnet50 import ResNet50
 #
@@ -60,16 +175,16 @@ array = tf.keras.preprocessing.image.img_to_array(state)
 # print('model', model)
 
 
-state = np.array(state)
-print('state', state)
-normalized_metrics = normalize(state, axis=0, norm='l1')
-print('norm', normalized_metrics)
+# state = np.array(state)
+# print('state', state)
+# normalized_metrics = normalize(state, axis=0, norm='l1')
+# print('norm', normalized_metrics)
 # for i in range(state[0]):
 #     for j in range(state[0]):
 #         state[i][j] = float(state[i][j])/float(255)
 
 
-print(state)
+# print(state)
 # arr = np.array(state)
 # print('array', arr)
 # shape = arr.shape
@@ -85,7 +200,6 @@ print(state)
 #     print('result_arr', result_arr[i])
 
 
-
 # print(env.isTerminal(state))
 # print(np.array(state))
 # tensor = tf.convert_to_tensor(state)
@@ -93,27 +207,8 @@ print(state)
 # env.reset()
 #
 #
-# x = []
-# y = []
-# n = 256 * 256
 #
-# for i in range(256):
-#     x.append(i)
-#     y.append(i)
 #
-# c = [[x0, y0] for x0 in x for y0 in y]
-#
-# i = 0
-# score = 0
-# counter = 0
-# while i < 256:
-#     action = random.choice(env.action_space)
-#     state_, reward, done, counter = env.step(action, c[i], counter)
-#     score += reward
-#     if done == True:
-#         break
-#     print('episode', i, 'action: ', action, 'score: ', score)
-#     i += 1
 
 # print(env.equal(terminal, initial))
 

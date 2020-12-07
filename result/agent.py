@@ -1,10 +1,11 @@
-import tensorflow as tf
-from tensorflow.keras.optimizers import Adam
-import tensorflow_probability as tfp
-from result.model import  ActorCriticNetwork
-import random
-from sklearn.preprocessing import normalize
 import numpy as np
+import tensorflow as tf
+import tensorflow_probability as tfp
+from sklearn.preprocessing import normalize
+from tensorflow.keras.optimizers import Adam
+
+from result.model import ActorCriticNetwork
+
 
 class Agent:
     def __init__(self, alpha=0.0003, gamma=0.99, n_actions=2):
@@ -22,26 +23,26 @@ class Agent:
         state = self.convert_img_to_tensor(observation)
         state = tf.convert_to_tensor(state)
         _, probs = self.actor_critic(state)
-        print('probs', probs)
         action_probabilities = tfp.distributions.Categorical(probs=probs)
-        print('probs', action_probabilities)
         action = action_probabilities.sample()
         log_prob = action_probabilities.log_prob(action)
-        self.action = action
-        print('action', action.numpy()[0])
-        if action.numpy()[0] == 0:
-            return 'click'
-        else:
-            return 'type'
-
-        # action = random.choice(action_space)
+        # print('action', action)
         # print('action', action.numpy()[0])
+        self.action = action
+        return action
+        # if action == 0:
+        #     return 'click'
+        # elif action == 1:
+        #     return 'type'
 
+        # print('action[0]', action[0][0])
+        # action_space = [0, 1]
+        # random_action = random.choice(action_space)
+        # self.action = random_action
 
     def save_models(self):
         print('... saving models ...')
         self.actor_critic.save_weights(self.actor_critic.checkpoint_file)
-
 
     def load_models(self):
         print('Loading models')
@@ -79,11 +80,24 @@ class Agent:
 
 
     def convert_img_to_tensor(self, state):
+        # print(type(state))
+        # image_path = fr'resources\known_states\15.png'
+        # img = image.load_img(image_path, target_size=(224, 224))
+        # model = VGG16()
+        # model = Model(inputs=model.inputs, outputs=model.layers[1].output)
+        # # model.summary()
+        # img = image.img_to_array(state)
+        # # print('img array', img)
+        # img = expand_dims(img, axis=0)
+        # # print('expand dims', img)
+        # img = preprocess_input(img)
+        # feature_maps = model.predict(img)
+        # return feature_maps
         state = np.array(state)
         shape = state.shape
         normalized_metrics = normalize(state, axis=0, norm='l1')
-        # flat_arr = state.ravel()
-        # result_arr = []
+        flat_arr = state.ravel()
+        result_arr = []
         # for i in range(len(flat_arr)):
         #     print('arr[i]', flat_arr[i], float(flat_arr[i]) / float(255))
         #     result_arr.append(float(flat_arr[i]) / float(255))

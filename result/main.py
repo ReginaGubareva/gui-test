@@ -3,27 +3,18 @@ from result.utils import plot_learning_curve
 import numpy as np
 import tensorflow as tf
 from result.environment import Environment
+import random
 
 if __name__ == '__main__':
     tf.config.run_functions_eagerly(True)
 
     env = Environment()
     score_history = []
-    num_episodes = 256
-    agent = Agent(alpha=1e-5, n_actions=2)
+    num_episodes = 100
+    agent = Agent(alpha=1e-5, n_actions=4)
 
     filename = 'learn.png'
     figure_file = fr'plots\learn.png'
-
-    x = []
-    y = []
-    n = 256 * 256
-
-    for i in range(256):
-        x.append(i)
-        y.append(i)
-
-    c = [[x0, y0] for x0 in x for y0 in y]
 
     best_score = 1
     score_history = []
@@ -36,18 +27,27 @@ if __name__ == '__main__':
     for i in range(num_episodes):
         counter = 0
         env.reset()
-        counter, observation = env.get_screen(counter)
+        counter, observation, thresh = env.get_screen(counter)
+        contours, centroids = env.get_contours(observation, thresh)
         done = False
         score = 0
-        j = 0
-        while not done or j < 256:
-                action = agent.choose_action(observation)
-                observation_, reward, done, counter = env.step(action, c[j], counter)
-                score += reward
-                j += 1
-                if not load_checkpoint:
-                    agent.learn(observation, reward, observation_, done)
-                observation = observation_
+        action = agent.choose_action(observation)
+        # while not done:
+        j = len(centroids) - 1
+        while j >= 0:
+            act = action[centroids[j][0]]
+            if act == 0:
+                act = 'click'
+            else:
+                act = 'type'
+            observation_, reward, done, counter = env.step(act, centroids[j], counter)
+            score += reward
+
+            if not load_checkpoint:
+                agent.learn(observation, reward, observation_, done)
+            observation = observation_
+            j -= 1
+
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
 
