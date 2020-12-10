@@ -18,7 +18,7 @@ class Environment:
         self.action_space = ['click', 'type']
 
     def step(self, action, coordinates, counter):
-        print('action:', action, '-- coordinates:', coordinates)
+        # print('action:', action, '-- coordinates:', coordinates)
         done = False
         reward = 0
         counter, state, th = self.get_screen(counter)
@@ -26,27 +26,30 @@ class Environment:
             pyautogui.moveTo(coordinates[0] + 327, coordinates[1] + 550)
             pyautogui.click()
             counter, state, th = self.get_screen(counter)
-            reward = 1
             if self.is_terminal(state):
                 done = True
                 reward = 3
-                print("Done")
+                # print("Done")
+            if self.no_changes(state):
+                reward = -1
+                # print('No changes')
         if action == "type":
-            pyautogui.moveTo(coordinates[0] + 330, coordinates[1] + 548)
+            pyautogui.moveTo(coordinates[0] + 340, coordinates[1] + 556)
             pyautogui.click()
             pyautogui.write("admin")
             counter, state, th = self.get_screen(counter)
-            reward = 1
             if self.is_terminal(state):
                 reward = 3
                 done = True
-                print("Done")
+                # print("Done")
             if self.no_changes(state):
                 reward = -1
+                # print('No changes')
         return state, reward, done, counter
 
     def reset(self):
         pyautogui.hotkey('f5')
+        time.sleep(2)
 
     def get_screen(self, counter):
         img = pyautogui.screenshot(region=(320, 545, 445, 265))
@@ -63,7 +66,7 @@ class Environment:
 
     def get_contours(self, observation, thresh):
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        print("Number of Contours found = " + str(len(contours)))
+        # print("Number of Contours found = " + str(len(contours)))
         centroids = []
         for i in range(len(contours)):
             Cx = 0
@@ -78,16 +81,18 @@ class Environment:
             C = [Cx, Cy]
             centroids.append(C)
 
-        print(centroids)
+        # print(centroids)
         return contours, centroids
 
     @staticmethod
     def is_terminal(state):
+        state = Image.fromarray(state)
         strs = pytesseract.image_to_string(state)
         strs = unidecode(strs)
-        str = "Hepephi nome vit naponis"
+        # print(strs)
+        str = "Cee"
         if strs.__contains__(str):
-            print('the terminal state')
+            # print('the terminal state')
             return True
         else:
             return False

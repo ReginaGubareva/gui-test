@@ -2,18 +2,49 @@ import time
 import cv2
 import matplotlib
 import numpy as np
+from PIL import Image
+import tensorflow as tf
+from result.environment import Environment
+
+# ******** CHECK IF STATE IS TERMINAL ********
+env = Environment()
+time.sleep(7)
+counter = 0
+counter, im_gray, thresh = env.get_screen(counter)
+print(type(im_gray))
+PIL_image = Image.fromarray(im_gray)
+PIL_image.save(fr"D:\gui-test\result\resources\0.png")
+# cv2.imwrite(fr'\result\0.png', im_gray)
+
+if env.is_terminal(PIL_image):
+    print('The state is terminal')
+else:
+    print("No it isn't terminal")
+
+# ******** CHECK IF AFTER ACTION NOTHING CHANGES********
+# env = Environment()
+# time.sleep(7)
+# counter = 0
+# counter, im_gray, thresh = env.get_screen(counter)
+# cv2.imwrite(fr'/result/resources/initial.png', im_gray)
+# initial = Image.open(fr'D:\gui-test\result\resources\initial.png')
+# initial = tf.keras.preprocessing.image.img_to_array(initial, data_format=None, dtype=None)
+# arr1 = np.array(initial)
+# state = tf.keras.preprocessing.image.img_to_array(im_gray, data_format=None, dtype=None)
+# arr2 = np.asarray(state)
+# print(np.array_equal(arr1, arr2))
 
 # ******** GET GUI ELEMENTS COUNTUR ********
-image_path = fr"D:\gui-test\test.png"
-im = cv2.imread(image_path)
-im_copy = im.copy()
-im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-ret, thresh = cv2.threshold(im_gray, 235, 255, cv2.THRESH_BINARY_INV)
-cv2.imshow(fr'D:\gui-test\contours.png', thresh)
-cv2.waitKey(0)
-
-contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-print("Number of Contours found = " + str(len(contours)))
+# image_path = fr"D:\gui-test\test.png"
+# im = cv2.imread(image_path)
+# im_copy = im.copy()
+# im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+# ret, thresh = cv2.threshold(im_gray, 235, 255, cv2.THRESH_BINARY_INV)
+# cv2.imshow(fr'D:\gui-test\contours.png', thresh)
+# cv2.waitKey(0)
+#
+# contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# print("Number of Contours found = " + str(len(contours)))
 
 # Draw all contours
 # for i in range(len(contours)):
@@ -22,39 +53,39 @@ print("Number of Contours found = " + str(len(contours)))
 
 # cnt = contours[3]
 # cv2.drawContours(im_copy, [cnt], 0, (255, 0, 0), 2)
-cv2.imshow('Contours', im_copy)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow('Contours', im_copy)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
 # ******** GET GUI ELEMENTS CENTROID ********
-M = cv2.moments(thresh)
-cX = int(M["m10"] / M["m00"])
-cY = int(M["m01"] / M["m00"])
+# M = cv2.moments(thresh)
+# cX = int(M["m10"] / M["m00"])
+# cY = int(M["m01"] / M["m00"])
 
 # cv2.circle(im_copy, (cX, cY), 5, (255, 0, 0), 2)
 # cv2.putText(im_copy, "centroid", (cX - 25, cY - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
 
-centroids = []
-for i in range(len(contours)):
-    Cx = 0
-    Cy = 0
-    for j in range(len(contours[i])):
-        Cx += contours[i][j][0][0]
-        Cy += contours[i][j][0][1]
-
-    Cx = int(Cx / len(contours[i]))
-    Cy = int(Cy / len(contours[i]))
-
-    C = [Cx, Cy]
-    centroids.append(C)
-
-print(centroids)
-
-for i in range(len(centroids)):
-    cX = centroids[i][0]
-    cY = centroids[i][1]
-    cv2.circle(im_copy, (cX, cY), 5, (255, 0, 0), 1)
+# centroids = []
+# for i in range(len(contours)):
+#     Cx = 0
+#     Cy = 0
+#     for j in range(len(contours[i])):
+#         Cx += contours[i][j][0][0]
+#         Cy += contours[i][j][0][1]
+#
+#     Cx = int(Cx / len(contours[i]))
+#     Cy = int(Cy / len(contours[i]))
+#
+#     C = [Cx, Cy]
+#     centroids.append(C)
+#
+# print(centroids)
+#
+# for i in range(len(centroids)):
+#     cX = centroids[i][0]
+#     cY = centroids[i][1]
+#     cv2.circle(im_copy, (cX, cY), 5, (255, 0, 0), 1)
 
 # cv2.circle(im_copy, (221, 218), 5, (255, 0, 0), 1)
 # cv2.circle(im_copy, (201, 192), 5, (0, 255, 0), 1)
@@ -63,8 +94,8 @@ for i in range(len(centroids)):
 # cv2.circle(im_copy, (111, 105), 5, (0, 255, 0), 1)
 # cv2.circle(im_copy, (121, 26), 5, (0, 0, 255), 1)
 
-cv2.imshow("Image", im_copy)
-cv2.waitKey(0)
+# cv2.imshow("Image", im_copy)
+# cv2.waitKey(0)
 # ******** GET GUI CONTOURS WITH MASK ********
 # image = cv2.imread(image_path)
 # imgray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#
@@ -133,7 +164,7 @@ cv2.waitKey(0)
 #     i += 1
 
 
-# image = Image.open(fr"result\resources\learning_screens\0.png")
+# image = Image.open(fr"result\resources\learning_screens\initial.png")
 # strs = pytesseract.image_to_string(image)
 # strs = unidecode(strs)
 # str = "Hepephi nome vit naponis"
